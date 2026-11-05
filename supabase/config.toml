@@ -1,0 +1,36 @@
+# Configuração do Supabase CLI (supabase start / supabase db push / supabase link)
+project_id = "the-seven-club"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 17
+
+[storage]
+enabled = true
+file_size_limit = "8MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/confirm", "https://app.theseven.club/auth/confirm"]
+jwt_expiry = 3600
+# Clube fechado: ninguém cria conta sozinha. As contas nascem do convite (API administrativa no servidor).
+enable_signup = false
+minimum_password_length = 8
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+max_frequency = "60s"
+
+[auth.email.template.recovery]
+subject = "Crie uma nova senha · THE SEVEN CLUB"
+content_path = "./supabase/templates/recovery.html"

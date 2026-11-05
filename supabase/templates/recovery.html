@@ -1,0 +1,13 @@
+<!-- Modelo do e-mail "Reset password" do Supabase (Authentication > Emails > Reset password) -->
+<div style="background:#F4EBDD;padding:32px 16px;font-family:Georgia,serif;color:#25251F">
+  <div style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:20px;padding:32px">
+    <p style="margin:0 0 4px;font-size:13px;letter-spacing:4px;color:#450B18">THE SEVEN CLUB</p>
+    <h1 style="margin:0 0 16px;font-weight:400;font-size:26px;color:#450B18">Crie uma nova senha</h1>
+    <p style="font-family:Arial,sans-serif;font-size:15px;line-height:1.5">Recebemos um pedido para trocar a senha da sua conta. O link vale por 1 hora e só pode ser usado uma vez.</p>
+    <p style="margin:28px 0">
+      <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/redefinir-senha"
+         style="display:inline-block;background:#450B18;color:#F4EBDD;text-decoration:none;font-family:Arial,sans-serif;font-weight:bold;font-size:15px;padding:14px 28px;border-radius:999px">Criar nova senha</a>
+    </p>
+    <p style="font-family:Arial,sans-serif;font-size:13px;color:#6b6157">Se não foi você, ignore este e-mail. Sua senha atual continua valendo.</p>
+  </div>
+</div>
