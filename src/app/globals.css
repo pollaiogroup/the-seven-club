@@ -1,0 +1,124 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-burgundy: #450b18;
+  --color-burgundy-deep: #2c0710;
+  --color-burgundy-soft: #5e1a29;
+  --color-ivory: #f4ebdd;
+  --color-paper: #fbf7f0;
+  --color-dusty: #c9afa8;
+  --color-dusty-soft: #e8dcd6;
+  --color-taupe: #9a8b78;
+  --color-muted: #6b5f51; /* taupe escurecido: 5,3:1 sobre ivory, para texto */
+  --color-espresso: #25251f;
+  --color-olive: #85866a;
+  --color-olive-ink: #5c5d47;
+  --color-line: #e3d7c6;
+  --color-grioh: #ff5002;
+  --color-danger: #9b2335;
+
+  --font-display: 'Playfair Display Variable', 'Playfair Display', Georgia, serif;
+  --font-sans: 'DM Sans Variable', 'DM Sans', system-ui, -apple-system, sans-serif;
+
+  --radius-card: 1.25rem;
+  --shadow-card: 0 1px 0 rgb(69 11 24 / 0.04), 0 8px 24px -12px rgb(69 11 24 / 0.18);
+  --ease-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--color-burgundy);
+  }
+  body {
+    min-height: 100dvh;
+    background: var(--color-ivory);
+    color: var(--color-espresso);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  /* 16px evita o zoom automático do iPhone ao focar campos */
+  input, textarea, select {
+    font-size: 16px;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-burgundy);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-dusty);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@utility pb-nav {
+  padding-bottom: calc(5.25rem + env(safe-area-inset-bottom));
+}
+@utility bottom-nav-offset {
+  bottom: calc(4.75rem + env(safe-area-inset-bottom));
+}
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+@utility tracking-brand {
+  letter-spacing: 0.28em;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+.animate-rise { animation: rise 0.45s var(--ease-soft) both; }
+.animate-sheet { animation: sheet-in 0.32s var(--ease-soft) both; }
+.skeleton {
+  background: linear-gradient(90deg, #ece2d3 0%, #f6efe4 50%, #ece2d3 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 0.75rem;
+}
+
+/* Ícone Grioh: traço do G segue a cor do texto; o ponto laranja é sempre o original */
+.grioh-icon { position: relative; display: inline-block; }
+.grioh-icon > .g {
+  position: absolute; inset: 0; background: currentColor;
+  -webkit-mask: url('/brand/grioh/grioh-g-mask.png') center / contain no-repeat;
+  mask: url('/brand/grioh/grioh-g-mask.png') center / contain no-repeat;
+}
+.grioh-icon > .dot {
+  position: absolute; inset: 0;
+  background: url('/brand/grioh/grioh-dot.png') center / contain no-repeat;
+}
+
+dialog::backdrop {
+  background: rgb(37 37 31 / 0.45);
+  backdrop-filter: blur(2px);
+}
