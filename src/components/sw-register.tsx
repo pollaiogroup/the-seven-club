@@ -5,7 +5,7 @@ import { toast } from '@/components/ui/toaster';
 /** Registra o service worker e avisa quando há uma versão nova do app. */
 export function ServiceWorker() {
   useEffect(() => {
-    if (!('serviceWorker' in navigator) || process.env.NODE_ENV !== 'production') return;
+    if (!navigator.serviceWorker || process.env.NODE_ENV !== 'production') return;
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (refreshing) return;
@@ -13,7 +13,7 @@ export function ServiceWorker() {
       window.location.reload();
     });
     navigator.serviceWorker.register('/sw.js', { scope: '/' }).then((reg) => {
-      reg.addEventListener('updatefound', () => {
+      reg?.addEventListener('updatefound', () => {
         const next = reg.installing;
         next?.addEventListener('statechange', () => {
           if (next.state === 'installed' && navigator.serviceWorker.controller) {

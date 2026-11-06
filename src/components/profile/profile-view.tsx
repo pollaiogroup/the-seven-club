@@ -117,7 +117,7 @@ export function ProfileView({ p, tab, posts, base, library = [] }: { p: ProfileP
 }
 
 /** Estante: capas em prateleiras de 3, com uma tábua sob cada fileira. */
-function Shelf({ entries }: { entries: LibraryEntry[] }) {
+export function Shelf({ entries }: { entries: LibraryEntry[] }) {
   const rows: LibraryEntry[][] = [];
   for (let i = 0; i < entries.length; i += 3) rows.push(entries.slice(i, i + 3));
   return (

@@ -43,7 +43,14 @@ export function InviteForm({ token, email }: { token: string; email: string }) {
       <label className="block"><span className={label}>Nome completo</span>
         <input name="full_name" required autoComplete="name" className={dark} /></label>
       <label className="block"><span className={label}>Seu @ no clube</span>
-        <input name="handle" required autoCapitalize="none" autoCorrect="off" pattern="[a-z0-9_.]{3,30}" className={dark} placeholder="ex.: seu.nome" /></label>
+        <input name="handle" required autoCapitalize="none" autoCorrect="off" spellCheck={false} pattern="[a-z0-9_.]{3,30}" className={dark} placeholder="ex.: seu.nome"
+          title="Use de 3 a 30 caracteres: letras minúsculas sem acento, números, ponto ou sublinhado."
+          onChange={(e) => {
+            // minúsculas e sem acento, como o banco exige; espaço vira ponto
+            const v = e.currentTarget.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '.').replace(/[^a-z0-9_.]/g, '');
+            if (v !== e.currentTarget.value) e.currentTarget.value = v;
+          }} />
+        <span className="mt-1.5 block text-[12px] text-dusty/80">Letras minúsculas, números, ponto ou sublinhado.</span></label>
       <label className="block"><span className={label}>Crie uma senha</span>
         <input name="password" type="password" minLength={8} required autoComplete="new-password" className={dark} /></label>
       <label className="flex items-start gap-3 py-1 text-[13px] leading-relaxed text-dusty">

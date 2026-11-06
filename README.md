@@ -1,6 +1,6 @@
 # THE SEVEN CLUB
 
-App mobile-first da sociedade THE SEVEN CLUB: Feed, Business, SEVEN, Ensino (Grioh) e Profile, mais Clube do Livro, Agenda, Afirmação do dia, busca, notificações e painel administrativo.
+App mobile-first da sociedade THE SEVEN CLUB: Feed, Business, SEVEN, Ensino (Grioh) e Profile, mais Clube do Livro, Agenda, Afirmação do dia, The Seven Club Planner, busca, notificações e painel administrativo.
 
 Next.js 16 (App Router) + TypeScript + Tailwind 4, com Supabase (Postgres, Auth, Storage e RLS), hospedado na Vercel. As integrantes instalam o app no celular direto pelo navegador (PWA), sem passar pela App Store nem pelo Google Play. Se um dia fizer sentido ir para as lojas, o projeto já está preparado com Capacitor.
 
@@ -10,7 +10,7 @@ Next.js 16 (App Router) + TypeScript + Tailwind 4, com Supabase (Postgres, Auth,
 src/app/(auth)/        entrar, convite/[token], recuperar, redefinir-senha, sobre/[slug]
 src/app/(app)/         área das integrantes, com a navegação inferior fixa
   feed  business  seven  ensino  perfil  integrantes  projetos  agenda
-  afirmacoes  clube-do-livro  biblioteca  busca  notificacoes  publicar  post  ajustes
+  afirmacoes  clube-do-livro  biblioteca  planner  busca  notificacoes  publicar  post  ajustes
 src/app/admin/         painel administrativo (layout e permissões próprios)
 src/app/api/           cron/dispatch (rotinas e push), export (LGPD), admin/relatorio (CSV)
 src/actions/           Server Actions, com validação no servidor
@@ -36,6 +36,7 @@ As regras abaixo valem no Postgres (RLS e gatilhos), não só na tela:
 - **Afirmação do dia:** é a mesma para todas no dia e não repete até esgotar a biblioteca. A administração pode fixar uma frase para qualquer data.
 - **Clube do Livro:** a votação só aceita voto dentro das datas e cada uma vê apenas o próprio voto; o placar só abre quando a votação fecha. A lista de quem vai ler é privada, e o clube vê só o total. Cupons aparecem a partir da data de início.
 - **Biblioteca:** qualquer integrante vê a estante das outras; só a dona registra, edita ou remove os próprios livros, com estrelas de 1 a 7.
+- **Planner:** é particular. Só a dona lê e grava as linhas e as páginas, como nos check-ins do SEVEN; nem a moderação nem a administração têm acesso. Entra na exportação de dados.
 
 ## Implantação
 
@@ -114,6 +115,15 @@ O app é um PWA: ganha ícone na tela de início, abre em tela cheia e recebe no
 - **iPhone:** as notificações só chegam com o app instalado na tela de início (iOS 16.4 ou mais novo). No Android, funcionam também no navegador.
 - **Navegadores dentro de outros apps** (Instagram, Facebook) não instalam: a página pede para abrir no Safari ou no Chrome.
 
+## The Seven Club Planner
+
+Agenda particular em `/planner`, pensada para tablet com caneta (Apple Pencil, S Pen) e também para o computador.
+
+- **Divisórias:** Meu mês (Dia, Semana e Mês), uma aba para cada um dos 7 pilares e a Estante. No tablet e no computador elas ficam na lateral da página; no celular, numa faixa no topo.
+- **Página do dia:** linhas com os botões Feito, Cancelar e Pular (passa a linha, com a escrita, para o dia seguinte) no início e o pilar no fim. Mostra a afirmação do dia, os encontros do clube e um calendário no canto. Toda sexta traz o fechamento da semana.
+- **Escrever ou digitar:** a caneta sempre escreve. No modo Escrever, o dedo e o mouse também escrevem, até a primeira caneta aparecer (aí o dedo deixa de riscar, para a palma não marcar a página). No modo Digitar, o toque vai para o texto. Tudo salva sozinho.
+- **Entrada:** menu lateral (tablet e computador), ícone no Perfil e cartão no SEVEN.
+
 ## Marca
 
 - **Grioh:** os arquivos oficiais estão em `public/brand/grioh/`. O ícone da navegação usa o G na cor do texto e o ponto laranja original.
@@ -150,8 +160,8 @@ npm run dev
 
 ```bash
 npm run typecheck
-npm run test:db    # 18 cenários de segurança (RLS, gatilhos e funções) no Postgres
-npm run test:e2e   # 28 fluxos no celular (iPhone simulado) contra o app real; screenshots em dev/.local/screens
+npm run test:db    # 19 cenários de segurança (RLS, gatilhos e funções) no Postgres
+npm run test:e2e   # 29 fluxos no celular (iPhone simulado) contra o app real; screenshots em dev/.local/screens
 ```
 
 Os dois testes aceitam `TEST_DATABASE_URL` e `E2E_DATABASE_URL` para rodar contra outra base. Dois fluxos (cadastro público fechado e recuperação de senha por e-mail) só rodam contra o Supabase Auth real, quando `MAIL_DIR` aponta para a pasta onde um SMTP local grava os e-mails.

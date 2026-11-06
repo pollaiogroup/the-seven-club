@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CalendarDays, Flame, History } from 'lucide-react';
+import { CalendarDays, ChevronRight, Flame, History, NotebookPen } from 'lucide-react';
 import { requireMember } from '@/lib/auth';
 import { rpc } from '@/lib/db';
 import type { Pillar, SevenOverview } from '@/lib/types';
@@ -29,6 +29,11 @@ export default async function SevenPage() {
         <div className="mt-5"><PillarList pillars={pillars} /></div>
         <p className="mt-3 px-2 text-center text-[12px] leading-relaxed text-muted">Seus registros são privados. Nada vai para o Feed sem você decidir compartilhar.</p>
         <div className="mt-5"><LinkButton href={`/seven/${next.slug}`} full size="lg">Registrar atividade</LinkButton></div>
+        <Link href="/planner" className="mt-4 flex items-center gap-3 rounded-[var(--radius-card)] bg-paper p-4 ring-1 ring-line transition hover:ring-dusty">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-burgundy text-ivory"><NotebookPen className="h-5 w-5" /></span>
+          <span className="min-w-0 flex-1 leading-snug"><span className="block font-semibold">The Seven Club Planner</span><span className="block text-[13px] text-muted">Sua agenda do dia nos 7 pilares, à mão ou digitando. Só você vê.</span></span>
+          <ChevronRight className="h-5 w-5 text-muted" />
+        </Link>
       </Sheet>
     </>
   );

@@ -312,6 +312,29 @@ await test('biblioteca: estante visível para todas, escrita só pela dona, estr
   assert.ok(x.r.library.some((l) => l.id === e.id), 'biblioteca entra na exportação de dados');
 });
 
+await test('planner: só a dona lê, grava, move e exporta as próprias linhas', async () => {
+  const [it] = await as(ana, `insert into public.planner_items (day, position, text, pillar_id) values (public.club_today(), 0, 'reunião privada', 4) returning id, owner_id`);
+  assert.equal(it.owner_id, ana.id);
+  for (const u of [bia, mod, admin]) {
+    assert.equal((await as(u, `select count(*)::int n from public.planner_items where id = $1`, [it.id]))[0].n, 0, 'ninguém além da dona vê a linha');
+    assert.equal((await as(u, `update public.planner_items set text = 'x' where id = $1 returning id`, [it.id])).length, 0);
+    assert.equal((await as(u, `delete from public.planner_items where id = $1 returning id`, [it.id])).length, 0);
+    await denied(as(u, `select public.planner_jump($1)`, [it.id]), /não encontrada/);
+  }
+  await denied(as(bia, `insert into public.planner_items (owner_id, day, text) values ($1, public.club_today(), 'intrusa')`, [ana.id]));
+  const [mv] = await as(ana, `select public.planner_jump($1) id`, [it.id]);
+  const [copy] = await as(ana, `select day = public.club_today() + 1 as tomorrow, text, pillar_id, moved_from from public.planner_items where id = $1`, [mv.id]);
+  assert.ok(copy.tomorrow && copy.text === 'reunião privada' && copy.pillar_id === 4 && copy.moved_from === it.id);
+  await as(ana, `select public.planner_jump($1)`, [it.id]);
+  assert.equal((await as(ana, `select status from public.planner_items where id = $1`, [it.id]))[0].status, 'open', 'pular de novo desfaz');
+  assert.equal((await as(ana, `select count(*)::int n from public.planner_items where id = $1`, [mv.id]))[0].n, 0);
+  await as(ana, `insert into public.planner_pages (key, text) values ('notas:body', 'só minha')`);
+  assert.equal((await as(admin, `select count(*)::int n from public.planner_pages where owner_id = $1`, [ana.id]))[0].n, 0);
+  await denied(as(ana, `insert into public.planner_pages (key, text) values ('qualquer', 'x')`));
+  const [x] = await as(ana, `select public.my_export() r`);
+  assert.ok(x.r.planner.some((l) => l.id === it.id) && x.r.planner_pages.length >= 1, 'planner entra na exportação de dados');
+});
+
 await test('rotinas agendadas não podem ser chamadas por integrantes', async () => {
   await denied(as(admin, `select public.expire_memberships()`));
   await denied(as(admin, `select public.queue_book_club()`));

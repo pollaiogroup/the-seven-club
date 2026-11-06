@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
-import { House, Store, UserRound } from 'lucide-react';
+import { House, NotebookPen, Store, UserRound } from 'lucide-react';
 import { GriohIcon, SevenStar } from '@/components/ui/icons';
 
 const ITEMS = [
@@ -11,6 +11,8 @@ const ITEMS = [
   { href: '/seven', label: 'Seven', match: ['/seven'] },
   { href: '/ensino', label: 'Ensino', match: ['/ensino'] },
   { href: '/perfil', label: 'Profile', match: ['/perfil', '/projetos', '/ajustes'] },
+  // no celular o planner abre pelo Perfil e pelo Seven; no tablet e no computador ganha lugar no menu lateral
+  { href: '/planner', label: 'Planner', match: ['/planner'] },
 ] as const;
 
 export function BottomNav({ handle }: { handle: string }) {
@@ -21,7 +23,7 @@ export function BottomNav({ handle }: { handle: string }) {
         {ITEMS.map((item) => {
           const active = item.match.some((m) => path === m || path.startsWith(`${m}/`)) || (item.href === '/perfil' && path === `/integrantes/${handle}`);
           return (
-            <li key={item.href}>
+            <li key={item.href} className={item.href === '/planner' ? 'hidden md:block' : undefined}>
               <Link
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
@@ -31,6 +33,7 @@ export function BottomNav({ handle }: { handle: string }) {
                 {item.href === '/business' && <Store className="h-[23px] w-[23px]" strokeWidth={active ? 2.2 : 1.6} />}
                 {item.href === '/seven' && <SevenStar outline={!active} strokeWidth={6} className="h-[24px] w-[24px]" />}
                 {item.href === '/ensino' && <GriohIcon className="h-[24px] w-[24px]" />}
+                {item.href === '/planner' && <NotebookPen className="h-[23px] w-[23px]" strokeWidth={active ? 2.2 : 1.6} />}
                 {item.href === '/perfil' && <UserRound className="h-[23px] w-[23px]" strokeWidth={active ? 2.2 : 1.6} fill={active ? 'currentColor' : 'none'} />}
                 <span>{item.label}</span>
               </Link>

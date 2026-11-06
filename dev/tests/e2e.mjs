@@ -381,6 +381,30 @@ await check('admin: Clube do Livro mostra a votação e cadastra livro no catál
   await shot(A, 'admin-clube-do-livro');
 });
 
+await check('planner: digitar, pilar, feito, cancelar e pular para amanhã', async () => {
+  await B.goto(`${BASE}/planner`);
+  await B.getByRole('radio', { name: 'Digitar' }).click();
+  const row = (i) => B.locator(`[data-slot="${i}"]`);
+  await row(0).getByRole('textbox').fill('ligar para a contadora');
+  await row(1).getByRole('textbox').fill('treino 7h');
+  await row(2).getByRole('textbox').fill('curso de oratória');
+  await row(1).getByRole('button', { name: 'Escolher pilar' }).click();
+  await row(1).getByRole('button', { name: 'BODY', exact: true }).click();
+  await B.waitForTimeout(900);
+  await row(1).getByRole('button', { name: 'Feito' }).click();
+  await row(2).getByRole('button', { name: 'Cancelar' }).click();
+  await row(0).getByRole('button', { name: 'Pular para amanhã' }).click();
+  await B.getByText('Linha passou para amanhã').waitFor();
+  await shot(B, 'planner-dia');
+  await B.reload();
+  assert.equal(await row(1).getByRole('button', { name: 'Feito' }).getAttribute('aria-pressed'), 'true');
+  assert.equal(await row(2).getByRole('button', { name: 'Cancelar' }).getAttribute('aria-pressed'), 'true');
+  await row(0).getByRole('button', { name: 'Trazer de volta para hoje' }).waitFor();
+  await B.getByRole('link', { name: 'Próximo dia' }).click();
+  assert.equal(await B.locator('[data-slot="0"]').getByRole('textbox').inputValue(), 'ligar para a contadora');
+  // a privacidade (nem a administração vê) é coberta nos testes de segurança do banco
+});
+
 await check('instalação sem loja: página pública, cartão no feed e mensagem do convite', async () => {
   const p = await newPage();
   await p.goto(`${BASE}/instalar`);
