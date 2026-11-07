@@ -11,6 +11,7 @@
     "local:db": "node dev/local-supabase/server.mjs",
     "test:db": "node dev/tests/rls.test.mjs",
     "test:e2e": "node dev/tests/e2e.mjs",
+    "test:checkout": "node dev/tests/checkout.mjs",
     "mobile:android": "cap add android && cap sync android",
     "mobile:ios": "cap add ios && cap sync ios",
     "mobile:sync": "cap sync",

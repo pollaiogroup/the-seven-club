@@ -124,6 +124,38 @@ Agenda particular em `/planner`, pensada para tablet com caneta (Apple Pencil, S
 - **Escrever ou digitar:** a caneta sempre escreve. No modo Escrever, o dedo e o mouse também escrevem, até a primeira caneta aparecer (aí o dedo deixa de riscar, para a palma não marcar a página). No modo Digitar, o toque vai para o texto. Tudo salva sozinho.
 - **Entrada:** menu lateral (tablet e computador), ícone no Perfil e cartão no SEVEN.
 
+## Assinatura pela landing page (Asaas)
+
+A landing page fica em `landing/`: `source.html` é o original e `the-seven-club.html` é o arquivo único, com as imagens embutidas, para subir no site da Pollaio. Para gerar de novo: `python3 landing/build.py`. O preço aparece em dois lugares marcados com `data-preco`.
+
+Como funciona:
+
+1. **Formulário:** a pessoa preenche nome, e-mail e WhatsApp. O formulário envia para `/api/assinatura`, que cria a sessão e o Asaas Checkout (assinatura mensal no cartão de crédito) e redireciona para o pagamento.
+2. **Volta do pagamento:** depois de pagar, ela volta para `/assinatura/obrigada`. A página se atualiza sozinha até o Asaas confirmar e então mostra o botão **Criar minha conta**, com o convite pessoal dela.
+3. **Webhook:** `/api/asaas/webhook` recebe os eventos do Asaas.
+   - `CHECKOUT_PAID` cria o convite.
+   - `PAYMENT_CONFIRMED` e `PAYMENT_RECEIVED` deixam a assinatura em dia, com vencimento de 1 mês e 5 dias de folga.
+   - `PAYMENT_OVERDUE` marca a assinatura como atrasada.
+   - `SUBSCRIPTION_DELETED` e `SUBSCRIPTION_INACTIVATED` marcam como cancelada.
+
+   O painel mostra o status em **Integrantes**.
+4. **Sessões e eventos:** ficam só no servidor (`checkout_sessions`, `asaas_events`). Ninguém do app tem acesso.
+
+Configuração:
+
+- **Variáveis da Vercel:**
+  - `ASAAS_API_KEY`;
+  - `ASAAS_ENV` (`sandbox` para testar; sem ela, usa a produção);
+  - `ASAAS_WEBHOOK_TOKEN`;
+  - `ASSINATURA_VALOR` (ex.: `197.00`);
+  - `LANDING_URL` (endereço da landing page);
+  - `CHECKOUT_RETURN_ORIGINS` (domínios da landing page, separados por vírgula).
+- **No Asaas, em Integrações > Webhooks:**
+  - URL `https://SEU-DOMINIO/api/asaas/webhook`;
+  - o mesmo token de `ASAAS_WEBHOOK_TOKEN`;
+  - os eventos de Checkout, Assinaturas e Cobranças.
+- **Teste local, com o Asaas simulado:** `npm run test:checkout` (veja o cabeçalho de `dev/tests/checkout.mjs`).
+
 ## Marca
 
 - **Grioh:** os arquivos oficiais estão em `public/brand/grioh/`. O ícone da navegação usa o G na cor do texto e o ponto laranja original.
@@ -160,7 +192,7 @@ npm run dev
 
 ```bash
 npm run typecheck
-npm run test:db    # 19 cenários de segurança (RLS, gatilhos e funções) no Postgres
+npm run test:db    # 20 cenários de segurança (RLS, gatilhos e funções) no Postgres
 npm run test:e2e   # 29 fluxos no celular (iPhone simulado) contra o app real; screenshots em dev/.local/screens
 ```
 

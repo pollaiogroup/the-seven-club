@@ -13,7 +13,7 @@ const W = 1000;
 export function InkPage({ pageKey, initial, ratio = 1.3, label, placeholder }: {
   pageKey: string; initial: { text: string; ink: Stroke[] | null }; ratio?: number; label: string; placeholder?: string;
 }) {
-  const { pushUndo, input } = usePlanner();
+  const { pushUndo } = usePlanner();
   const [text, setText] = useState(initial.text);
   const [ink, setInk] = useState<Stroke[]>(initial.ink ?? []);
   const area = useRef<HTMLTextAreaElement>(null);
@@ -36,14 +36,14 @@ export function InkPage({ pageKey, initial, ratio = 1.3, label, placeholder }: {
   return (
     <div className="relative w-full overflow-hidden rounded-2xl bg-paper ring-1 ring-line" style={{ aspectRatio: `1 / ${ratio}` }}>
       <div aria-hidden className="absolute inset-0" style={{ backgroundImage: 'repeating-linear-gradient(to bottom, transparent 0 35px, #E3D7C6 35px 36px)', backgroundPosition: '0 20px' }} />
-      <textarea
-        ref={area} value={text} maxLength={6000} aria-label={label} placeholder={ink.length ? undefined : placeholder}
-        onChange={(e) => { setText(e.target.value); later(); }}
-        className={clsx('absolute inset-0 h-full w-full resize-none bg-transparent px-5 pt-[27px] font-display text-[18px] leading-[36px] text-[#2D2A3E] italic outline-none placeholder:text-dusty')}
-      />
-      <InkCanvas className={clsx('absolute inset-0', input === 'type' && 'pointer-events-none')} strokes={ink} basis="width" units={W} penWidth={3.4} label={`${label}: escrita à mão`}
-        onTypeTap={() => area.current?.focus()}
-        onChange={(next, prev) => { setInk(next); state.current.ink = next; later(); pushUndo(() => { setInk(prev); state.current.ink = prev; later(300); }); }} />
+      <InkCanvas className="absolute inset-0" strokes={ink} basis="width" units={W} penWidth={3.4} label={`${label}: escrita à mão`}
+        onChange={(next, prev) => { setInk(next); state.current.ink = next; later(); pushUndo(() => { setInk(prev); state.current.ink = prev; later(300); }); }}>
+        <textarea
+          ref={area} value={text} maxLength={6000} aria-label={label} placeholder={ink.length ? undefined : placeholder}
+          onChange={(e) => { setText(e.target.value); later(); }}
+          className="absolute inset-0 h-full w-full resize-none bg-transparent px-5 pt-[27px] font-display text-[18px] leading-[36px] text-[#2D2A3E] italic outline-none placeholder:text-dusty"
+        />
+      </InkCanvas>
     </div>
   );
 }

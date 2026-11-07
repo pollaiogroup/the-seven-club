@@ -8,16 +8,17 @@ import { SevenStar } from '@/components/ui/icons';
 import { INK_COLORS, PlannerProvider, usePlanner } from './planner-context';
 
 function Toolbar() {
-  const { input, setInput, tool, setTool, color, setColor, undo, canUndo } = usePlanner();
+  const { input, setInput, tool, setTool, color, setColor, undo, canUndo, penSeen } = usePlanner();
   const seg = (on: boolean) => clsx('flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold transition', on ? 'bg-burgundy text-ivory' : 'text-muted hover:text-burgundy');
   const ic = (on: boolean) => clsx('flex h-9 w-9 items-center justify-center rounded-full transition', on ? 'bg-burgundy text-ivory' : 'text-espresso hover:bg-burgundy/5');
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div role="radiogroup" aria-label="Como escrever" className="flex rounded-full bg-paper p-1 ring-1 ring-line">
-        <button type="button" role="radio" aria-checked={input === 'ink'} className={seg(input === 'ink')} onClick={() => setInput('ink')}><PenLine className="h-4 w-4" />Escrever</button>
-        <button type="button" role="radio" aria-checked={input === 'type'} className={seg(input === 'type')} onClick={() => setInput('type')}><Keyboard className="h-4 w-4" />Digitar</button>
+        <button type="button" role="radio" aria-checked={input === 'type'} title="Toque numa linha para digitar. A caneta escreve à mão mesmo assim." className={seg(input === 'type')} onClick={() => setInput('type')}><Keyboard className="h-4 w-4" />Digitar</button>
+        <button type="button" role="radio" aria-checked={input === 'ink'} title="O dedo e o mouse também escrevem à mão." className={seg(input === 'ink')} onClick={() => setInput('ink')}><PenLine className="h-4 w-4" />Escrever</button>
       </div>
-      <div className="flex items-center gap-1 rounded-full bg-paper p-1 ring-1 ring-line">
+      {/* ferramentas de caneta: aparecem quando há escrita à mão em uso */}
+      <div className={clsx('items-center gap-1 rounded-full bg-paper p-1 ring-1 ring-line', input === 'ink' || penSeen ? 'flex' : 'hidden sm:flex')}>
         <button type="button" aria-label="Caneta" aria-pressed={tool === 'pen'} className={ic(tool === 'pen')} onClick={() => setTool('pen')}><PenLine className="h-[18px] w-[18px]" /></button>
         <button type="button" aria-label="Borracha" aria-pressed={tool === 'eraser'} className={ic(tool === 'eraser')} onClick={() => setTool('eraser')}><Eraser className="h-[18px] w-[18px]" /></button>
         <span className="mx-1 h-5 w-px bg-line" />

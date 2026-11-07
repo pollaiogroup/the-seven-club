@@ -73,27 +73,32 @@ function Line({ slot, item, onText, onInk, onDone, onCancel, onJump, onPillar }:
   return (
     <div className="flex h-[48px] items-end gap-2.5 border-b border-line sm:gap-3" data-slot={slot}>
       <StatusButtons item={item} onDone={onDone} onCancel={onCancel} onJump={onJump} />
-      <div className="relative h-full min-w-0 flex-1">
+      <InkCanvas
+        className={clsx('relative h-full min-w-0 flex-1', faded && '[&>canvas]:opacity-45')}
+        strokes={item?.ink ?? []} onChange={onInk} basis="height" units={LINE_UNITS} penWidth={2.3}
+        label={`Escrita à mão da linha ${slot + 1}`}
+      >
         <input
           ref={input}
           value={item?.text ?? ''}
           onChange={(e) => onText(e.target.value)}
+          onKeyDown={(e) => {
+            // Enter desce para a próxima linha, como num caderno
+            if (e.key === 'Enter') { e.preventDefault(); (document.querySelector(`[data-slot="${slot + 1}"] input`) as HTMLInputElement | null)?.focus(); }
+          }}
           maxLength={300}
+          enterKeyHint="next"
+          autoComplete="off"
           aria-label={`Linha ${slot + 1}`}
-          className={clsx('absolute inset-x-0 bottom-[3px] w-full bg-transparent pr-2 font-display text-[19px] italic outline-none placeholder:text-line',
+          className={clsx('absolute inset-x-0 bottom-[3px] w-full bg-transparent pr-2 font-display text-[17px] italic outline-none sm:text-[19px]',
             st === 'done' && 'text-[#9C93A6] line-through decoration-burgundy decoration-[1.5px]', st === 'cancelled' && 'text-[#B9AFA4] line-through', st === 'moved' && 'text-olive', st === 'open' && 'text-[#2D2A3E]')}
-        />
-        <InkCanvas
-          className={clsx('absolute inset-0', faded && 'opacity-45')}
-          strokes={item?.ink ?? []} onChange={onInk} basis="height" units={LINE_UNITS} penWidth={2.3}
-          onTypeTap={() => input.current?.focus()} label={`Escrita à mão da linha ${slot + 1}`}
         />
         {faded && !!item?.ink?.length && (st === 'done' || st === 'cancelled') && (
           // risca só a largura da escrita (as unidades da tinta valem 48/40 px numa linha de 48 px)
-          <span aria-hidden className={clsx('pointer-events-none absolute left-0 top-[60%] h-[1.5px] max-w-full', st === 'done' ? 'bg-burgundy/60' : 'bg-muted/40')}
+          <span aria-hidden className={clsx('pointer-events-none absolute left-0 top-[60%] z-10 h-[1.5px] max-w-full', st === 'done' ? 'bg-burgundy/60' : 'bg-muted/40')}
             style={{ width: Math.max(...item.ink.flatMap((k) => k.p.filter((_, i) => i % 3 === 0))) * (48 / LINE_UNITS) + 4 }} />
         )}
-      </div>
+      </InkCanvas>
       {st === 'moved' && <span className="shrink-0 pb-[10px] text-[9.5px] font-bold tracking-[.12em] text-olive">AMANHÃ</span>}
       {st === 'open' && item?.moved_from && <span className="hidden shrink-0 pb-[10px] text-[9.5px] font-bold tracking-[.12em] text-taupe sm:inline">ADIADA</span>}
       <div className="shrink-0 pb-[8px]"><PillarPicker value={item?.pillar_id ?? null} onPick={onPillar} /></div>
@@ -193,7 +198,8 @@ export function DayView({ day, today, initial, affirmation, events, marks }: {
             ? <p className="mt-4 rounded-xl bg-ivory px-4 py-3 font-display text-[16px] leading-snug text-burgundy italic">“{affirmation}”</p>
             : <p className="mt-4 rounded-xl bg-ivory px-4 py-3 text-[13px] text-muted">A afirmação deste dia aparece na manhã do dia.</p>}
         </div>
-        <MiniCalendar day={day} today={today} marks={marks} />
+        {/* no celular o calendário fica na visão Mês, para as linhas aparecerem logo */}
+        <div className="hidden sm:block"><MiniCalendar day={day} today={today} marks={marks} /></div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">

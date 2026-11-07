@@ -383,10 +383,13 @@ await check('admin: Clube do Livro mostra a votação e cadastra livro no catál
 
 await check('planner: digitar, pilar, feito, cancelar e pular para amanhã', async () => {
   await B.goto(`${BASE}/planner`);
-  await B.getByRole('radio', { name: 'Digitar' }).click();
   const row = (i) => B.locator(`[data-slot="${i}"]`);
-  await row(0).getByRole('textbox').fill('ligar para a contadora');
-  await row(1).getByRole('textbox').fill('treino 7h');
+  // no celular, digitar é o padrão: toca na linha, digita, e o Enter desce para a próxima
+  await row(0).getByRole('textbox').tap();
+  await B.keyboard.type('ligar para a contadora');
+  await B.keyboard.press('Enter');
+  await B.keyboard.type('treino 7h');
+  assert.equal(await row(1).getByRole('textbox').inputValue(), 'treino 7h');
   await row(2).getByRole('textbox').fill('curso de oratória');
   await row(1).getByRole('button', { name: 'Escolher pilar' }).click();
   await row(1).getByRole('button', { name: 'BODY', exact: true }).click();

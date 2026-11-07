@@ -335,6 +335,16 @@ await test('planner: só a dona lê, grava, move e exporta as próprias linhas',
   assert.ok(x.r.planner.some((l) => l.id === it.id) && x.r.planner_pages.length >= 1, 'planner entra na exportação de dados');
 });
 
+await test('assinatura: sessões de checkout e eventos do Asaas ficam só no servidor', async () => {
+  await sys(`insert into public.checkout_sessions (full_name, email, value) values ('Teste Checkout', $1, 197)`, [`checkout-${run}@teste.local`]);
+  for (const u of [ana, admin]) {
+    await denied(as(u, `select count(*) from public.checkout_sessions`));
+    await denied(as(u, `select count(*) from public.asaas_events`));
+    await denied(as(u, `select public.email_is_member('a@b.c')`));
+  }
+  await denied(as(null, `select count(*) from public.checkout_sessions`));
+});
+
 await test('rotinas agendadas não podem ser chamadas por integrantes', async () => {
   await denied(as(admin, `select public.expire_memberships()`));
   await denied(as(admin, `select public.queue_book_club()`));

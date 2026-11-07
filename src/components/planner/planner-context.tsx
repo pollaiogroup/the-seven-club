@@ -19,7 +19,7 @@ export const usePlanner = () => {
   return c;
 };
 
-const KEY = 'seven:planner-input';
+const KEY = 'seven:planner-input-v2';
 
 export function PlannerProvider({ children }: { children: React.ReactNode }) {
   const [tool, setTool] = useState<Tool>('pen');
@@ -29,12 +29,11 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   const stack = useRef<(() => void)[]>([]);
   const [depth, setDepth] = useState(0);
 
-  // No tablet a escrita à mão vem ligada; no computador, a digitação. A escolha fica salva neste aparelho.
+  // Digitar é o padrão em todo aparelho (a caneta escreve à mão mesmo assim). A escolha fica salva neste aparelho.
   useEffect(() => {
     let saved: string | null = null;
     try { saved = localStorage.getItem(KEY); } catch { /* armazenamento indisponível */ }
     if (saved === 'ink' || saved === 'type') setInputState(saved);
-    else if (window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 1) setInputState('ink');
   }, []);
   const setInput = useCallback((m: InputMode) => { setInputState(m); try { localStorage.setItem(KEY, m); } catch { /* ignora */ } }, []);
   const markPen = useCallback(() => setPenSeen(true), []);
