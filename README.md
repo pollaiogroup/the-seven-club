@@ -74,10 +74,11 @@ A rota `/api/cron/dispatch` faz quatro coisas:
 - agenda a afirmação do dia;
 - envia os avisos do Clube do Livro (livro do mês no dia 1 a partir das 9h, votação, resultado, cupons e lembretes do encontro);
 - cria os lembretes do SEVEN, das afirmações e dos eventos no horário que cada integrante escolheu;
+- envia os avisos da agenda: na véspera (20h) e de manhã (8h), só nos dias com linhas no Planner ou encontros em que a integrante está inscrita;
 - marca as assinaturas vencidas;
 - envia as notificações push pendentes.
 
-O `vercel.json` chama essa rota uma vez por dia (8h de Brasília; os avisos que esperam as 9h saem na chamada seguinte), o limite do plano gratuito da Vercel. Um agendamento mais frequente nesse plano faz o deploy falhar. Para rodar a cada 10 minutos, há dois caminhos: no plano Pro, troque o `schedule` para `*/10 * * * *`; ou agende pelo próprio Supabase, com as extensões `pg_cron` e `pg_net` ligadas:
+O `vercel.json` chama essa rota duas vezes por dia, às 8h e às 20h de Brasília (no plano gratuito, cada rotina roda uma vez por dia e pode atrasar até 59 minutos). Os avisos que esperam as 9h saem na chamada seguinte. Com essas duas chamadas, os avisos da agenda saem nos horários padrão; se a integrante escolher outro horário em Ajustes, o aviso só chega no horário certo com a rotina a cada 10 minutos. Um agendamento mais frequente nesse plano faz o deploy falhar. Para rodar a cada 10 minutos, há dois caminhos: no plano Pro, troque o `schedule` para `*/10 * * * *`; ou agende pelo próprio Supabase, com as extensões `pg_cron` e `pg_net` ligadas:
 
 ```sql
 select cron.schedule('seven-dispatch', '*/10 * * * *', $$
@@ -147,7 +148,7 @@ Configuração:
   - `ASAAS_API_KEY`;
   - `ASAAS_ENV` (`sandbox` para testar; sem ela, usa a produção);
   - `ASAAS_WEBHOOK_TOKEN`;
-  - `ASSINATURA_VALOR` (ex.: `197.00`);
+  - os planos e preços ficam em `src/lib/plans.ts` (Club Online R$ 35,90 e Club São Paulo R$ 99,90); para trocar um preço sem subir código, `ASSINATURA_VALOR_ONLINE` ou `ASSINATURA_VALOR_SAO_PAULO`;
   - `LANDING_URL` (endereço da landing page);
   - `CHECKOUT_RETURN_ORIGINS` (domínios da landing page, separados por vírgula).
 - **No Asaas, em Integrações > Webhooks:**
